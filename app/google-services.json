@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "348080131910",
+    "project_id": "locbasedreminder",
+    "storage_bucket": "locbasedreminder.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:348080131910:android:60f85b78cda11dfab55f47",
+        "android_client_info": {
+          "package_name": "com.example.locbasedreminder"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6UZfPa42SkIdA7OG9KVmd9nh8MNyOBTQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
