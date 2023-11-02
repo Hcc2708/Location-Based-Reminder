@@ -40,12 +40,10 @@ class MapActivity2 : FragmentActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_map2)
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
         val submitButton = findViewById<Button>(R.id.submitButton)
         submitButton.setOnClickListener {
-            // Pass the chosen location back to the calling activity
             val resultIntent = Intent()
             resultIntent.putExtra(EXTRA_CHOSEN_LOCATION, chosenLocation)
             setResult(Activity.RESULT_OK, resultIntent)
@@ -57,14 +55,13 @@ class MapActivity2 : FragmentActivity(), OnMapReadyCallback {
         mMap = googleMap
 
         // Set a default location (e.g., your city or any location you prefer)
-        val defaultLocation = LatLng(latitude, longitude)
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLocation, 15f))
+//        val defaultLocation = LatLng(latitude, longitude)
+//        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLocation, 15f))
+//
+//        // Set a marker at the default location
+//        mMap.addMarker(MarkerOptions().position(defaultLocation).title("You are here"))
 
-        // Set a marker at the default location
-        mMap.addMarker(MarkerOptions().position(defaultLocation).title("You are here"))
-
-        if(isLocationEnabled()) {
-            if (ActivityCompat.checkSelfPermission(
+        if (ActivityCompat.checkSelfPermission(
                     this,
                     Manifest.permission.ACCESS_FINE_LOCATION
                 ) == PackageManager.PERMISSION_GRANTED
@@ -74,26 +71,18 @@ class MapActivity2 : FragmentActivity(), OnMapReadyCallback {
                         val currentLocation = LatLng(it.latitude, it.longitude)
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15f))
 
-                        // Set a marker at the default location (current location)
                         mMap.addMarker(
                             MarkerOptions().position(currentLocation).title("You are here")
                         )
                     }
                 }
             } else {
-                // Handle the case when location permission is not granted
-                // You may request permission here or handle it in another way
+
             }
-        }
-        else {
-            Toast.makeText(this, "Please turn on location", Toast.LENGTH_LONG).show()
-            val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-            startActivity(intent)
-        }
-        // Set a click listener for the map
+
+
         mMap.setOnMapClickListener { latLng ->
-            // When the user clicks on the map, send back the chosen location
-            mMap.clear()
+//            mMap.clear()
 
             if (ActivityCompat.checkSelfPermission(
                     this,
@@ -107,10 +96,8 @@ class MapActivity2 : FragmentActivity(), OnMapReadyCallback {
                     }
                 }
             }
-            // Add a marker at the clicked location
             mMap.addMarker(MarkerOptions().position(latLng).title("Chosen Location"))
 
-            // Save the chosen location
             chosenLocation = latLng
 
         }
@@ -137,6 +124,5 @@ class MapActivity2 : FragmentActivity(), OnMapReadyCallback {
             }
         }
     }
-//    Make sure to define MAP_REQUEST_CODE and EXTRA_CHOSEN_LOCATION as constants in your code.
 
 }

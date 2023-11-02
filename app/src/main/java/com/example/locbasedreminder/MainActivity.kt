@@ -2,11 +2,14 @@ package com.example.locbasedreminder
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
 import android.os.Looper
+import android.provider.Settings
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ListView
@@ -41,7 +44,7 @@ class MainActivity : AppCompatActivity() {
 
         val reminders = mutableListOf<Reminder>()
         remindersListView = findViewById(R.id.remindersListView)
-        val openMapButton = findViewById<Button>(R.id.mapbutton1)
+//        val openMapButton = findViewById<Button>(R.id.mapbutton1)
         val pickonmap = findViewById<Button>(R.id.pickonmap)
         reminders.add(Reminder("Meeting", 37.7749, -122.4194))
         reminders.add(Reminder("Grocery Shopping", 37.7749, -122.4324))
@@ -54,27 +57,30 @@ class MainActivity : AppCompatActivity() {
 //            // TODO: Implement logic to add new reminders
 //        }
         pickonmap.setOnClickListener {
-            // Start the MapActivity to pick a location
-            startActivityForResult(Intent(this, MapActivity2::class.java), MAP_REQUEST_CODE)
+            if(isLocationEnabled()) {
+                startActivityForResult(Intent(this, MapActivity2::class.java), MAP_REQUEST_CODE)
+            }
+            else {
+                Toast.makeText(this, "Please turn on location", Toast.LENGTH_LONG).show()
+                val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                startActivity(intent)
+            }
         }
-        openMapButton.setOnClickListener {
-            startActivity(Intent(this, MapActivity::class.java))
-        }
+//        openMapButton.setOnClickListener {
+//            startActivity(Intent(this, MapActivity::class.java))
+//        }
 
-        // Request location permission if not granted
         if (ContextCompat.checkSelfPermission(
                 this,
                 android.Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            // Request the permission
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
                 LOCATION_PERMISSION_REQUEST_CODE
             )
         } else {
-            // Permission is already granted, start location updates
             startLocationUpdates()
         }
 
@@ -82,14 +88,12 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    // Initialize the LocationRequest
     private val locationRequest: LocationRequest = LocationRequest.create().apply {
-        interval = 10000 // Update interval in milliseconds
-        fastestInterval = 5000 // Fastest update interval in milliseconds
+        interval = 10000
+        fastestInterval = 5000
         priority = LocationRequest.PRIORITY_HIGH_ACCURACY
     }
 
-    // Create a LocationCallback
     private val locationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
             super.onLocationResult(locationResult)
@@ -98,7 +102,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Start location updates
     private fun startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -172,6 +175,14 @@ class MainActivity : AppCompatActivity() {
                 onMapLocationPicked(chosenLocation)
             }
         }
+    }
+    private fun isLocationEnabled(): Boolean {
+        val locationManager: LocationManager =
+            getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+                || locationManager.isProviderEnabled(
+            LocationManager.NETWORK_PROVIDER
+        )
     }
     // Show a reminder notification
     private fun showReminderNotification() {

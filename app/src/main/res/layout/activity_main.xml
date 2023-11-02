@@ -13,17 +13,12 @@
         android:dividerHeight="1dp"
         android:textAlignment="center" />
 
-    <Button
-        android:id="@+id/mapbutton1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/remindersListView"
-        android:text="open map" />
+
 
     <Button
         android:id="@+id/pickonmap"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/mapbutton1"
+        android:layout_below="@+id/remindersListView"
         android:text="pick on map" />
 </RelativeLayout>
