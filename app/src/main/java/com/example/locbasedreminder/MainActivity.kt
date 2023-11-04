@@ -96,7 +96,7 @@ class MainActivity : AppCompatActivity() {
         override fun onLocationResult(locationResult: LocationResult) {
             super.onLocationResult(locationResult)
             // Handle location updates
-            locationResult.lastLocation?.let { onLocationChanged(it) }
+            locationResult.lastLocation?.let { isUserNearReminderLocation(it) }
         }
     }
 
@@ -119,30 +119,30 @@ class MainActivity : AppCompatActivity() {
         fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 
-    private fun onLocationChanged(location: Location) {
-        if (isUserNearReminderLocation(location)) {
-            showReminderNotification()
-        }
-    }
+//    private fun onLocationChanged(location: Location) {
+//        if (isUserNearReminderLocation(location)) {
+//            showReminderNotification()
+//        }
+//    }
     fun setReminderLocation1(newLocation: Location, task: String) {
 
         Database.addReminder(newLocation.latitude, newLocation.longitude, task)
     }
     private fun isUserNearReminderLocation(location: Location): Boolean {
-        for ((reminderLatLng, task) in Database.getReminders()) {
-            val reminderLocation = Location("").apply {
-                latitude = reminderLatLng.latitude
-                longitude = reminderLatLng.longitude
-            }
+        var reminderShown = false
 
+        for ((reminderLocation, task) in reminders) {
             val proximityRadius = 10.0
-            if (location.distanceTo(reminderLocation) <= proximityRadius) {
-                taskAtLocation = task
-                return true
+            val reminderLatLng = Location("").apply {
+                latitude = reminderLocation.latitude
+                longitude = reminderLocation.longitude
+            }
+            if (location.distanceTo(reminderLatLng) <= proximityRadius) {
+                 showReminderNotification(task)
             }
         }
-        return false
 
+        return reminderShown
     }
 
     private fun onMapLocationPicked(chosenLocation: LatLng, task:String) {
@@ -176,8 +176,8 @@ class MainActivity : AppCompatActivity() {
             LocationManager.NETWORK_PROVIDER
         )
     }
-    private fun showReminderNotification() {
-        Toast.makeText(this, taskAtLocation, Toast.LENGTH_LONG).show()
+    private fun showReminderNotification(task: String) {
+        Toast.makeText(this, task, Toast.LENGTH_LONG).show()
     }
 
 }
