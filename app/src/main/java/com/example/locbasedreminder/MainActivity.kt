@@ -23,6 +23,7 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 
 class MainActivity : AppCompatActivity() {
@@ -45,7 +46,7 @@ class MainActivity : AppCompatActivity() {
          fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         remindersListView = findViewById(R.id.remindersListView)
-        val pickonmap = findViewById<Button>(R.id.pickonmap)
+        val pickonmap = findViewById<FloatingActionButton>(R.id.pickonmap)
         Database = ReminderDatabaseHelper(this)
          reminders = Database.getReminders()
 //        reminderAdapter = ReminderAdapter(this, reminders)
