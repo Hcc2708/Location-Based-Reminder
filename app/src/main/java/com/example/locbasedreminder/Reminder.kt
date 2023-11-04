@@ -1,4 +1,6 @@
 package com.example.locbasedreminder
 
-data class Reminder(val title: String, val latitude: Double, val longitude: Double)
+import com.google.android.gms.maps.model.LatLng
+
+data class Reminder(val location: LatLng, val task: String)
 

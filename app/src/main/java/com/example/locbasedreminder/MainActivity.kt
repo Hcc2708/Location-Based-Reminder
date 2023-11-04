@@ -24,7 +24,6 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
 
-//import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -35,6 +34,9 @@ class MainActivity : AppCompatActivity() {
     private val MAP_REQUEST_CODE = 123
     private val EXTRA_CHOSEN_LOCATION = "chosen_location"
     lateinit var reminderLocation:Location
+    lateinit var taskAtLocation:String
+    lateinit var reminders:MutableList<Reminder>
+    lateinit var Database:ReminderDatabaseHelper
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,20 +44,20 @@ class MainActivity : AppCompatActivity() {
 
          fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        val reminders = mutableListOf<Reminder>()
         remindersListView = findViewById(R.id.remindersListView)
-//        val openMapButton = findViewById<Button>(R.id.mapbutton1)
         val pickonmap = findViewById<Button>(R.id.pickonmap)
-        reminders.add(Reminder("Meeting", 37.7749, -122.4194))
-        reminders.add(Reminder("Grocery Shopping", 37.7749, -122.4324))
+        Database = ReminderDatabaseHelper(this)
+         reminders = Database.getReminders()
+//        reminderAdapter = ReminderAdapter(this, reminders)
+        reminderAdapter = ReminderAdapter(this, reminders) { position ->
+            val reminder = reminders[position]
+            Database.removeReminderByTask(reminder.task)
+            reminders.removeAt(position)
+            reminderAdapter.notifyDataSetChanged()
+        }
 
-        reminderAdapter = ReminderAdapter(this, reminders)
         remindersListView.adapter = reminderAdapter
 
-        // Handle adding new reminders and opening the map
-//        addButton.setOnClickListener {
-//            // TODO: Implement logic to add new reminders
-//        }
         pickonmap.setOnClickListener {
             if(isLocationEnabled()) {
                 startActivityForResult(Intent(this, MapActivity2::class.java), MAP_REQUEST_CODE)
@@ -66,10 +68,6 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
-//        openMapButton.setOnClickListener {
-//            startActivity(Intent(this, MapActivity::class.java))
-//        }
-
         if (ContextCompat.checkSelfPermission(
                 this,
                 android.Manifest.permission.ACCESS_FINE_LOCATION
@@ -111,68 +109,62 @@ class MainActivity : AppCompatActivity() {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
+
             return
         }
         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
     }
 
-    // Stop location updates
     private fun stopLocationUpdates() {
         fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 
-    // Handle location changes
     private fun onLocationChanged(location: Location) {
-        // Check if the user is near the predefined location and trigger a reminder
         if (isUserNearReminderLocation(location)) {
-            // Show a reminder notification or perform the desired action
             showReminderNotification()
         }
     }
-    fun setReminderLocation1(newLocation: Location) {
-        reminderLocation = newLocation
+    fun setReminderLocation1(newLocation: Location, task: String) {
+
+        Database.addReminder(newLocation.latitude, newLocation.longitude, task)
     }
-    // Check if the user is near the predefined location
     private fun isUserNearReminderLocation(location: Location): Boolean {
-        // Replace with the coordinates of your reminder location
-        return if (::reminderLocation.isInitialized) {
-            // Set the radius for proximity (in meters)
-            val proximityRadius = 10.0
+        for ((reminderLatLng, task) in Database.getReminders()) {
+            val reminderLocation = Location("").apply {
+                latitude = reminderLatLng.latitude
+                longitude = reminderLatLng.longitude
+            }
 
-            // Check if the user is within the specified radius of the reminder location
-            location.distanceTo(reminderLocation) <= proximityRadius
-        } else {
-            false
+            val proximityRadius = 10.0
+            if (location.distanceTo(reminderLocation) <= proximityRadius) {
+                taskAtLocation = task
+                return true
+            }
         }
+        return false
+
     }
 
-    private fun onMapLocationPicked(chosenLocation: LatLng) {
-        // Create a Location object from the chosen LatLng
+    private fun onMapLocationPicked(chosenLocation: LatLng, task:String) {
         val chosenReminderLocation = Location("").apply {
             latitude = chosenLocation.latitude
             longitude = chosenLocation.longitude
         }
+        Database.addReminder(chosenLocation.latitude, chosenLocation.longitude, task)
+        val newReminder = Reminder(chosenLocation, task)
 
-        // Set the chosen location as the reminder location
-        setReminderLocation1(chosenReminderLocation)
+        reminderAdapter.add(newReminder)
+        reminderAdapter.notifyDataSetChanged()
+        setReminderLocation1(chosenReminderLocation, task)
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == MAP_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            // Get the chosen location from the MapActivity
             val chosenLocation = data?.getParcelableExtra<LatLng>(EXTRA_CHOSEN_LOCATION)
-
-            // Use the chosen location as needed
-            if (chosenLocation != null) {
-                onMapLocationPicked(chosenLocation)
+            val task = data?.getStringExtra("task")
+            if (chosenLocation != null && task != null) {
+                onMapLocationPicked(chosenLocation, task)
             }
         }
     }
@@ -184,10 +176,8 @@ class MainActivity : AppCompatActivity() {
             LocationManager.NETWORK_PROVIDER
         )
     }
-    // Show a reminder notification
     private fun showReminderNotification() {
-        // Implement the logic to show a notification
-        Toast.makeText(this, "You have task at this destination", Toast.LENGTH_LONG).show()
+        Toast.makeText(this, taskAtLocation, Toast.LENGTH_LONG).show()
     }
 
 }
