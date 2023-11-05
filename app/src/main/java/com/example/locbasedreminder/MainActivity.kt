@@ -10,6 +10,7 @@ import android.location.LocationManager
 import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
+import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ListView
@@ -48,11 +49,12 @@ class MainActivity : AppCompatActivity() {
         val pickonmap = findViewById<Button>(R.id.pickonmap)
         Database = ReminderDatabaseHelper(this)
          reminders = Database.getReminders()
-//        reminderAdapter = ReminderAdapter(this, reminders)
         reminderAdapter = ReminderAdapter(this, reminders) { position ->
             val reminder = reminders[position]
+            Log.d("ReminderAdapter", "Before removal - Size: ${reminders.size}")
             Database.removeReminderByTask(reminder.task)
             reminders.removeAt(position)
+            Log.d("ReminderAdapter", "After removal - Size: ${reminders.size}")
             reminderAdapter.notifyDataSetChanged()
         }
 
@@ -124,10 +126,12 @@ class MainActivity : AppCompatActivity() {
 //            showReminderNotification()
 //        }
 //    }
-    fun setReminderLocation1(newLocation: Location, task: String) {
-
-        Database.addReminder(newLocation.latitude, newLocation.longitude, task)
-    }
+//    fun setReminderLocation1(newLocation: Location, task: String) {
+//
+//        Database.addReminder(newLocation.latitude, newLocation.longitude, task)
+////        reminders.add(Reminder(LatLng(newLocation.latitude, newLocation.longitude), task))
+//        reminderAdapter.notifyDataSetChanged()
+//    }
     private fun isUserNearReminderLocation(location: Location): Boolean {
         var reminderShown = false
 
@@ -139,6 +143,7 @@ class MainActivity : AppCompatActivity() {
             }
             if (location.distanceTo(reminderLatLng) <= proximityRadius) {
                  showReminderNotification(task)
+                 reminderShown = true
             }
         }
 
@@ -155,7 +160,6 @@ class MainActivity : AppCompatActivity() {
 
         reminderAdapter.add(newReminder)
         reminderAdapter.notifyDataSetChanged()
-        setReminderLocation1(chosenReminderLocation, task)
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

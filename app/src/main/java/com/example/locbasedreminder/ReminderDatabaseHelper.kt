@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
 import com.google.android.gms.maps.model.LatLng
 
 class ReminderDatabaseHelper(context: Context) :
@@ -63,18 +64,21 @@ class ReminderDatabaseHelper(context: Context) :
                     reminders.add(Reminder(LatLng(latitude, longitude), task))
                 }
             } while (cursor.moveToNext())
+
+
+
+            cursor.close()
+            db.close()
         }
-
-        cursor.close()
-        db.close()
-
         return reminders
     }
     fun removeReminderByTask(task: String) {
+        Log.d("ReminderDatabaseHelper", "Before removal - Size: ${getReminders().size}")
         val db = writableDatabase
         val whereClause = "$COLUMN_TASK = ?"
         val whereArgs = arrayOf(task)
         db.delete(TABLE_NAME, whereClause, whereArgs)
         db.close()
+        Log.d("ReminderDatabaseHelper", "after removal - Size: ${getReminders().size}")
     }
 }
