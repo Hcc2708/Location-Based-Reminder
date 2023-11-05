@@ -12,6 +12,7 @@ import android.os.Looper
 import android.provider.Settings
 import android.util.Log
 import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.ListView
 import android.widget.Toast
@@ -24,6 +25,9 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.api.net.FetchPlaceRequest
 
 
 class MainActivity : AppCompatActivity() {
@@ -42,13 +46,13 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        val pickonmap = findViewById<Button>(R.id.pickonmap)
+        val searchOnMap = findViewById<Button>(R.id.searchOnMap)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         remindersListView = findViewById(R.id.remindersListView)
-        val pickonmap = findViewById<Button>(R.id.pickonmap)
         Database = ReminderDatabaseHelper(this)
-         reminders = Database.getReminders()
+        reminders = Database.getReminders()
         reminderAdapter = ReminderAdapter(this, reminders) { position ->
             val reminder = reminders[position]
             Log.d("ReminderAdapter", "Before removal - Size: ${reminders.size}")
@@ -60,6 +64,8 @@ class MainActivity : AppCompatActivity() {
 
         remindersListView.adapter = reminderAdapter
 
+
+
         pickonmap.setOnClickListener {
             if(isLocationEnabled()) {
                 startActivityForResult(Intent(this, MapActivity2::class.java), MAP_REQUEST_CODE)
@@ -68,6 +74,23 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Please turn on location", Toast.LENGTH_LONG).show()
                 val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
                 startActivity(intent)
+                if(isLocationEnabled()) {
+                    startActivityForResult(Intent(this, MapActivity2::class.java), MAP_REQUEST_CODE)
+                }
+            }
+        }
+        searchOnMap.setOnClickListener {
+            if(isLocationEnabled()) {
+                startActivityForResult(Intent(this, SearchViaGeocoder::class.java), MAP_REQUEST_CODE)
+            }
+            else {
+                Toast.makeText(this, "Please turn on location", Toast.LENGTH_LONG).show()
+                val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                startActivity(intent)
+                if(isLocationEnabled()) {
+                    startActivityForResult(Intent(this, SearchViaGeocoder::class.java), MAP_REQUEST_CODE)
+
+                }
             }
         }
         if (ContextCompat.checkSelfPermission(
@@ -83,6 +106,7 @@ class MainActivity : AppCompatActivity() {
         } else {
             startLocationUpdates()
         }
+
 
 
     }
@@ -121,17 +145,6 @@ class MainActivity : AppCompatActivity() {
         fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 
-//    private fun onLocationChanged(location: Location) {
-//        if (isUserNearReminderLocation(location)) {
-//            showReminderNotification()
-//        }
-//    }
-//    fun setReminderLocation1(newLocation: Location, task: String) {
-//
-//        Database.addReminder(newLocation.latitude, newLocation.longitude, task)
-////        reminders.add(Reminder(LatLng(newLocation.latitude, newLocation.longitude), task))
-//        reminderAdapter.notifyDataSetChanged()
-//    }
     private fun isUserNearReminderLocation(location: Location): Boolean {
         var reminderShown = false
 
@@ -180,6 +193,8 @@ class MainActivity : AppCompatActivity() {
             LocationManager.NETWORK_PROVIDER
         )
     }
+
+
     private fun showReminderNotification(task: String) {
         Toast.makeText(this, task, Toast.LENGTH_LONG).show()
     }

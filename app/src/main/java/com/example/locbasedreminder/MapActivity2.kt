@@ -14,6 +14,7 @@ import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -34,11 +35,8 @@ import java.util.Locale
 class MapActivity2 : FragmentActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
-    private val MAP_REQUEST_CODE = 123
     private val EXTRA_CHOSEN_LOCATION = "chosen_location"
     private val TASK_AT_THE_LOCATION = "task"
-    private var longitude:Double = 0.0
-    private var latitude:Double = 0.0
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
     private val permissionId = 2
     private var chosenLocation: LatLng? = null
@@ -48,7 +46,9 @@ class MapActivity2 : FragmentActivity(), OnMapReadyCallback {
     lateinit var taskEditText:EditText
     lateinit var saveButton:Button
     lateinit var popupWindow:PopupWindow
-
+     var receivedValue:LatLng? = null
+     var  xOffset:Int = 0
+     var  yOffset:Int = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map2)
@@ -64,42 +64,37 @@ class MapActivity2 : FragmentActivity(), OnMapReadyCallback {
             LinearLayout.LayoutParams.WRAP_CONTENT,
             true
         )
+        xOffset = -popupView.width / 2
+        yOffset = -popupView.height - 50
+        receivedValue = intent.getParcelableExtra("chosen_location1")
 
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync(this)
+            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+            val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+            mapFragment.getMapAsync(this)
 
         saveButton.setOnClickListener {
             val task = taskEditText.text.toString()
             if (task.isNotEmpty()) {
-                // Handle the task input, e.g., save it along with the location
                 yourTask = task
                 popupWindow.dismiss()
+                val resultIntent = Intent()
+                resultIntent.putExtra(EXTRA_CHOSEN_LOCATION, chosenLocation)
+                resultIntent.putExtra(TASK_AT_THE_LOCATION, yourTask)
+                setResult(Activity.RESULT_OK, resultIntent)
+                finish()
             } else {
-                // Notify the user that the task cannot be empty
                 Toast.makeText(this, "Task cannot be empty", Toast.LENGTH_SHORT).show()
             }
+
         }
 
-        val submitButton = findViewById<Button>(R.id.submitButton)
-        submitButton.setOnClickListener {
-            val resultIntent = Intent()
-            resultIntent.putExtra(EXTRA_CHOSEN_LOCATION, chosenLocation)
-            resultIntent.putExtra(TASK_AT_THE_LOCATION, yourTask)
-            setResult(Activity.RESULT_OK, resultIntent)
-            finish()
-        }
+
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        // Set a default location (e.g., your city or any location you prefer)
-//        val defaultLocation = LatLng(latitude, longitude)
-//        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLocation, 15f))
-//
-//        // Set a marker at the default location
-//        mMap.addMarker(MarkerOptions().position(defaultLocation).title("You are here"))
+
 
         if (ActivityCompat.checkSelfPermission(
                     this,
@@ -107,22 +102,56 @@ class MapActivity2 : FragmentActivity(), OnMapReadyCallback {
                 ) == PackageManager.PERMISSION_GRANTED
             ) {
                 mFusedLocationClient.lastLocation?.addOnSuccessListener { location: Location? ->
-                    location?.let {
-                        val currentLocation = LatLng(it.latitude, it.longitude)
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15f))
+                    if(receivedValue == null) {
+                        location?.let {
+                            val currentLocation = LatLng(it.latitude, it.longitude)
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15f))
+
+                            mMap.addMarker(
+                                MarkerOptions().position(currentLocation).title("You are here")
+                            )
+                        }
+                    }
+                    else {
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(receivedValue, 15f))
 
                         mMap.addMarker(
-                            MarkerOptions().position(currentLocation).title("You are here")
+                            MarkerOptions().position(receivedValue).title("You are here")
                         )
+                        val markerScreenPosition = mMap.projection.toScreenLocation(receivedValue)
+
+
+                        popupWindow.showAtLocation(popupView, Gravity.NO_GRAVITY, markerScreenPosition.x + xOffset, markerScreenPosition.y + yOffset)
+                        chosenLocation = receivedValue
                     }
                 }
             } else {
 
             }
 
+            setLocation(googleMap)
+
+
+
+    }
+    @SuppressLint("MissingSuperCall")
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        if (requestCode == permissionId) {
+            if ((grantResults.isNotEmpty() && grantResults[0] ==
+                        PackageManager.PERMISSION_GRANTED)) {
+            }
+        }
+    }
+    fun setLocation(googleMap: GoogleMap){
+        mMap = googleMap
 
         mMap.setOnMapClickListener { latLng ->
             mMap.clear()
+            if(receivedValue == null)
             if (ActivityCompat.checkSelfPermission(
                     this,
                     Manifest.permission.ACCESS_FINE_LOCATION
@@ -136,39 +165,14 @@ class MapActivity2 : FragmentActivity(), OnMapReadyCallback {
                 }
             }
             mMap.addMarker(MarkerOptions().position(latLng).title("Chosen Location"))
-//            popupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0)
 
             val markerScreenPosition = mMap.projection.toScreenLocation(latLng)
 
-            // Set the pop-up window position relative to the marker
-            val xOffset = -popupView.width / 2
-            val yOffset = -popupView.height - 50  // Adjust this value based on your preference
+
 
             popupWindow.showAtLocation(popupView, Gravity.NO_GRAVITY, markerScreenPosition.x + xOffset, markerScreenPosition.y + yOffset)
             chosenLocation = latLng
 
-        }
-    }
-
-    private fun isLocationEnabled(): Boolean {
-        val locationManager: LocationManager =
-            getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-                || locationManager.isProviderEnabled(
-            LocationManager.NETWORK_PROVIDER
-        )
-    }
-
-    @SuppressLint("MissingSuperCall")
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        if (requestCode == permissionId) {
-            if ((grantResults.isNotEmpty() && grantResults[0] ==
-                        PackageManager.PERMISSION_GRANTED)) {
-            }
         }
     }
 

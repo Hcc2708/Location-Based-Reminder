@@ -18,7 +18,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LocBasedReminder"
         tools:targetApi="31">
-
+        <activity
+            android:name=".SearchViaGeocoder"
+            android:exported="true" />
+        <activity
+            android:name=".SearchOnMap"
+            android:exported="true" />
         <activity
             android:name=".MapActivity2"
             android:exported="true" />
