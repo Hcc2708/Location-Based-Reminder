@@ -80,11 +80,13 @@ class MainActivity : AppCompatActivity() {
 
         option.setOnClickListener{
             if(enable){
+                option.setImageResource(R.drawable.baseline_add_task_24)
                 pickonmap.show()
                 searchOnMap.show()
                 enable = false
             }
             else {
+                option.setImageResource(R.drawable.baseline_playlist_add_circle_24)
                 pickonmap.hide()
                 searchOnMap.hide()
                 enable = true
