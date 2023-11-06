@@ -33,7 +33,7 @@ class SearchViaGeocoder : AppCompatActivity() {
         val adapter = ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line)
         searchAutoCompleteTextView.setAdapter(adapter)
 
-        val suggestedLocations = listOf("Location1", "Location2", "Location3")
+        val suggestedLocations = listOf("LPU", "pagwara", "jalandhar")
         adapter.clear()
         adapter.addAll(suggestedLocations)
         adapter.notifyDataSetChanged()

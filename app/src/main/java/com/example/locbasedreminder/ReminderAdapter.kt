@@ -24,6 +24,8 @@ class ReminderAdapter(context: Context, reminders: List<Reminder>, private val o
         deleteButton.setOnClickListener {
             onDeleteClickListener.invoke(position)
         }
+
+
         return view
     }
 }
