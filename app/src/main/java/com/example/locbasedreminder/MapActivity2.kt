@@ -48,6 +48,7 @@ class MapActivity2 : FragmentActivity(), OnMapReadyCallback {
     lateinit var taskEditText:EditText
     lateinit var saveButton:Button
     lateinit var popupWindow:PopupWindow
+    lateinit var task:String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,7 +71,7 @@ class MapActivity2 : FragmentActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
 
         saveButton.setOnClickListener {
-            val task = taskEditText.text.toString()
+             task = taskEditText.text.toString()
             if (task.isNotEmpty()) {
                 // Handle the task input, e.g., save it along with the location
                 yourTask = task
@@ -94,12 +95,7 @@ class MapActivity2 : FragmentActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        // Set a default location (e.g., your city or any location you prefer)
-//        val defaultLocation = LatLng(latitude, longitude)
-//        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLocation, 15f))
-//
-//        // Set a marker at the default location
-//        mMap.addMarker(MarkerOptions().position(defaultLocation).title("You are here"))
+
 
         if (ActivityCompat.checkSelfPermission(
                     this,
