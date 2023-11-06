@@ -7,16 +7,15 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
-import android.opengl.Visibility
+import android.os.Build
 import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
 import android.util.Log
 import android.widget.ArrayAdapter
-import android.widget.AutoCompleteTextView
-import android.widget.Button
 import android.widget.ListView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -26,9 +25,6 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.libraries.places.api.Places
-import com.google.android.libraries.places.api.model.Place
-import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 
@@ -45,6 +41,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var reminders:MutableList<Reminder>
     lateinit var Database:ReminderDatabaseHelper
     var enable = true
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,7 +50,8 @@ class MainActivity : AppCompatActivity() {
         val pickonmap = findViewById<FloatingActionButton>(R.id.pickonmap)
         val searchOnMap = findViewById<FloatingActionButton>(R.id.searchOnMap)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-
+//        startForegroundService(Intent(this, ReminderService::class.java))
+        startForegroundService(Intent(this, ReminderService::class.java))
         remindersListView = findViewById(R.id.remindersListView)
         Database = ReminderDatabaseHelper(this)
         reminders = Database.getReminders()
@@ -63,6 +61,8 @@ class MainActivity : AppCompatActivity() {
             Database.removeReminderByTask(reminder.task)
             reminders.removeAt(position)
             Log.d("ReminderAdapter", "After removal - Size: ${reminders.size}")
+//            stopService(Intent(this, ReminderService::class.java))
+//            startForegroundService(Intent(this, ReminderService::class.java))
             reminderAdapter.notifyDataSetChanged()
         }
 
@@ -108,87 +108,23 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        if (ContextCompat.checkSelfPermission(
-                this,
-                android.Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
-                LOCATION_PERMISSION_REQUEST_CODE
-            )
-        } else {
-            startLocationUpdates()
-        }
-
-
-
     }
 
-
-    private val locationRequest: LocationRequest = LocationRequest.create().apply {
-        interval = 10000
-        fastestInterval = 5000
-        priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-    }
-
-    private val locationCallback = object : LocationCallback() {
-        override fun onLocationResult(locationResult: LocationResult) {
-            super.onLocationResult(locationResult)
-            // Handle location updates
-            locationResult.lastLocation?.let { isUserNearReminderLocation(it) }
-        }
-    }
-
-    private fun startLocationUpdates() {
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-
-            return
-        }
-        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
-    }
-
-    private fun stopLocationUpdates() {
-        fusedLocationClient.removeLocationUpdates(locationCallback)
-    }
-
-    private fun isUserNearReminderLocation(location: Location): Boolean {
-        var reminderShown = false
-
-        for ((reminderLocation, task) in reminders) {
-            val proximityRadius = 10.0
-            val reminderLatLng = Location("").apply {
-                latitude = reminderLocation.latitude
-                longitude = reminderLocation.longitude
-            }
-            if (location.distanceTo(reminderLatLng) <= proximityRadius) {
-                 showReminderNotification(task)
-                 reminderShown = true
-            }
-        }
-
-        return reminderShown
-    }
-
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun onMapLocationPicked(chosenLocation: LatLng, task:String) {
         val chosenReminderLocation = Location("").apply {
             latitude = chosenLocation.latitude
             longitude = chosenLocation.longitude
         }
         Database.addReminder(chosenLocation.latitude, chosenLocation.longitude, task)
+//        stopService(Intent(this, ReminderService::class.java))
+//        startForegroundService(Intent(this, ReminderService::class.java))
         val newReminder = Reminder(chosenLocation, task)
 
         reminderAdapter.add(newReminder)
         reminderAdapter.notifyDataSetChanged()
     }
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -208,12 +144,6 @@ class MainActivity : AppCompatActivity() {
             LocationManager.NETWORK_PROVIDER
         )
     }
-
-
-    private fun showReminderNotification(task: String) {
-        Toast.makeText(this, task, Toast.LENGTH_LONG).show()
-    }
-
 }
 
 

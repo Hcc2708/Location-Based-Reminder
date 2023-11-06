@@ -33,7 +33,6 @@ import com.google.android.gms.maps.model.MarkerOptions
 import java.util.Locale
 
 class MapActivity2 : FragmentActivity(), OnMapReadyCallback {
-
     private lateinit var mMap: GoogleMap
     private val EXTRA_CHOSEN_LOCATION = "chosen_location"
     private val TASK_AT_THE_LOCATION = "task"
@@ -87,7 +86,6 @@ class MapActivity2 : FragmentActivity(), OnMapReadyCallback {
             }
 
         }
-
 
     }
 

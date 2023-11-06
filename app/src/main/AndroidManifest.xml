@@ -7,6 +7,9 @@
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="true"
@@ -18,6 +21,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LocBasedReminder"
         tools:targetApi="31">
+        <activity
+            android:name=".ToStopReminderService"
+            android:exported="false" />
         <activity
             android:name=".SearchViaGeocoder"
             android:exported="true" />
@@ -37,6 +43,14 @@
             </intent-filter>
         </activity>
 
+        <service
+            android:name=".ReminderService"
+            android:exported="false" />
+
+        <receiver
+            android:name=".StopServiceReceiver"
+            android:exported="false">
+        </receiver>
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDU0i-grq5tK2rQQgobnk8DqWWjyas7wdA" />

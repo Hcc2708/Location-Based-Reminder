@@ -8,7 +8,6 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.TextView
 
-//import kotlinx.android.synthetic.main.item_reminder.view.*
 
 class ReminderAdapter(context: Context, reminders: List<Reminder>, private val onDeleteClickListener: (Int) -> Unit) :
     ArrayAdapter<Reminder>(context, 0, reminders) {
@@ -16,6 +15,11 @@ class ReminderAdapter(context: Context, reminders: List<Reminder>, private val o
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val reminder : Reminder? = getItem(position)
         val layoutInflater:LayoutInflater = LayoutInflater.from(context)
+
+        if (reminder == null) {
+            val noRemindersView = layoutInflater.inflate(R.layout.item_no_reminder, null)
+            return noRemindersView
+        }
         val view:View = layoutInflater.inflate(R.layout.itemreminder, null)
         val txt  = view.findViewById<TextView>(R.id.titleTextView)
         txt.text = reminder?.task
@@ -23,6 +27,10 @@ class ReminderAdapter(context: Context, reminders: List<Reminder>, private val o
         deleteButton.setOnClickListener {
             onDeleteClickListener.invoke(position)
         }
+        view.setOnClickListener{
+
+        }
         return view
     }
+
 }
