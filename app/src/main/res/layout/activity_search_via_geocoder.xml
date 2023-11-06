@@ -8,13 +8,17 @@
 
     <AutoCompleteTextView
         android:id="@+id/autoCompleteTextView"
-        android:layout_width="match_parent"
+        android:layout_width="120pt"
         android:layout_height="wrap_content"
-        android:hint="Search for a location"/>
+        android:hint="Search for a location"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:gravity="center"/>
     <Button
         android:id="@+id/search1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="search"
-        android:layout_below="@+id/autoCompleteTextView"/>
+        android:layout_below="@+id/autoCompleteTextView"
+        android:layout_centerHorizontal="true"/>
 </RelativeLayout>

@@ -23,7 +23,6 @@ class SearchOnMap : AppCompatActivity() {
         setContentView(R.layout.activity_search_on_map)
 
         // Initialize Places API
-        Places.initialize(applicationContext, "AIzaSyAiPxiLmZ6o-OTpTm_Gx0tkn-3nRTT1gnA")
         placesClient = Places.createClient(this)
 
         // Initialize AutoCompleteTextView

@@ -16,17 +16,60 @@
         />
 
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="10dp"
+        android:orientation="vertical"
+        android:padding="10dp">
 
-    <Button
-        android:id="@+id/pickonmap"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/remindersListView"
-        android:text="pick on map" />
-    <Button
-        android:id="@+id/searchOnMap"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Search On Map"
-        android:layout_below="@id/pickonmap"/>
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/searchOnMap"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:layout_marginBottom="16dp"
+            android:tint="@color/white"
+            android:contentDescription="@string/app_name"
+            android:padding="4dp"
+            android:visibility="gone"
+            android:src="@drawable/baseline_location_searching_24"
+            android:backgroundTint="@color/quantum_purple200"
+            />
+
+        <!--on below line we are creating a home fab
+        and setting its visibility to gone-->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/pickonmap"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:layout_marginBottom="16dp"
+            android:background="@color/quantum_purple200"
+            android:contentDescription="@string/app_name"
+            android:padding="4dp"
+            android:src="@drawable/baseline_pin_drop_24"
+            android:visibility="gone"
+            android:backgroundTint="@color/quantum_purple200"
+            android:tint="@color/white" />
+
+        <!--on below line we are creating a settings fab
+        and setting its visibility to gone-->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/options"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:layout_marginBottom="16dp"
+            android:background="@color/quantum_purple"
+            android:contentDescription="@string/app_name"
+            android:padding="4dp"
+            android:src="@drawable/baseline_add_task_24"
+            android:backgroundTint="@color/quantum_purple"
+            android:tint="@color/white" />
+
+    </LinearLayout>
 </RelativeLayout>

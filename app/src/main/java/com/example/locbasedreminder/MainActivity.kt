@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
+import android.opengl.Visibility
 import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
@@ -28,6 +29,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.FetchPlaceRequest
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 
 class MainActivity : AppCompatActivity() {
@@ -42,12 +44,14 @@ class MainActivity : AppCompatActivity() {
     lateinit var taskAtLocation:String
     lateinit var reminders:MutableList<Reminder>
     lateinit var Database:ReminderDatabaseHelper
+    var enable = true
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val pickonmap = findViewById<Button>(R.id.pickonmap)
-        val searchOnMap = findViewById<Button>(R.id.searchOnMap)
+        val option = findViewById<FloatingActionButton>(R.id.options)
+        val pickonmap = findViewById<FloatingActionButton>(R.id.pickonmap)
+        val searchOnMap = findViewById<FloatingActionButton>(R.id.searchOnMap)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         remindersListView = findViewById(R.id.remindersListView)
@@ -64,7 +68,18 @@ class MainActivity : AppCompatActivity() {
 
         remindersListView.adapter = reminderAdapter
 
-
+        option.setOnClickListener{
+            if(enable){
+                pickonmap.show()
+                searchOnMap.show()
+                enable = false
+            }
+            else {
+                pickonmap.hide()
+                searchOnMap.hide()
+                enable = true
+            }
+        }
 
         pickonmap.setOnClickListener {
             if(isLocationEnabled()) {
