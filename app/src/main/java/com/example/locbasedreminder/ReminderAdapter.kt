@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 
 //import kotlinx.android.synthetic.main.item_reminder.view.*
@@ -19,7 +20,7 @@ class ReminderAdapter(context: Context, reminders: List<Reminder>, private val o
         val view:View = layoutInflater.inflate(R.layout.itemreminder, null)
         val txt  = view.findViewById<TextView>(R.id.titleTextView)
         txt.text = reminder?.task
-        val deleteButton = view.findViewById<Button>(R.id.delete)
+        val deleteButton = view.findViewById<ImageButton>(R.id.delete)
         deleteButton.setOnClickListener {
             onDeleteClickListener.invoke(position)
         }
