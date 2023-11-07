@@ -75,11 +75,7 @@ class MainActivity : AppCompatActivity() {
 
         remindersListView.adapter = reminderAdapter
 
-        remindersListView.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
-            val selectedItem = reminders[position].toString() // Get the selected item
-            // Handle the item click, e.g., open a new activity or show details
-            Toast.makeText(this, "You clicked: $selectedItem", Toast.LENGTH_SHORT).show()
-        }
+
 
 
 
