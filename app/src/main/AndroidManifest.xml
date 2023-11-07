@@ -21,20 +21,19 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LocBasedReminder"
         tools:targetApi="31">
-        <activity
-            android:name=".ToStopReminderService"
-            android:exported="false" />
+
         <activity
             android:name=".SearchViaGeocoder"
+            android:label="@string/app_name"
             android:exported="true" />
-        <activity
-            android:name=".SearchOnMap"
-            android:exported="true" />
+
         <activity
             android:name=".MapActivity2"
+            android:label="@string/app_name"
             android:exported="true" />
         <activity
             android:name=".MainActivity"
+            android:label="@string/app_name"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

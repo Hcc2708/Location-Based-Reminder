@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Looper
@@ -15,6 +16,7 @@ import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -46,9 +48,12 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+//        val toolbar:Toolbar?  = findViewById(R.id.toolbar)
+//        setSupportActionBar(toolbar)
         val option = findViewById<FloatingActionButton>(R.id.options)
         val pickonmap = findViewById<FloatingActionButton>(R.id.pickonmap)
         val searchOnMap = findViewById<FloatingActionButton>(R.id.searchOnMap)
+        val openMap = findViewById<FloatingActionButton>(R.id.openMap)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 //        startForegroundService(Intent(this, ReminderService::class.java))
         startForegroundService(Intent(this, ReminderService::class.java))
@@ -61,7 +66,7 @@ class MainActivity : AppCompatActivity() {
             Database.removeReminderByTask(reminder.task)
             reminders.removeAt(position)
             Log.d("ReminderAdapter", "After removal - Size: ${reminders.size}")
-//            stopService(Intent(this, ReminderService::class.java))
+////            stopService(Intent(this, ReminderService::class.java))
 //            startForegroundService(Intent(this, ReminderService::class.java))
             reminderAdapter.notifyDataSetChanged()
         }
@@ -72,11 +77,13 @@ class MainActivity : AppCompatActivity() {
             if(enable){
                 pickonmap.show()
                 searchOnMap.show()
+                openMap.show()
                 enable = false
             }
             else {
                 pickonmap.hide()
                 searchOnMap.hide()
+                openMap.hide()
                 enable = true
             }
         }
@@ -108,6 +115,25 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+        openMap.setOnClickListener{
+            if(isLocationEnabled()){
+//                val uri  = Uri.parse("geo:")
+                val mapIntent = Intent()
+                mapIntent.setPackage("com.google.android.apps.maps")
+                startActivity(mapIntent)
+            }
+            else{
+                Toast.makeText(this, "Please turn on location", Toast.LENGTH_LONG).show()
+                val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                startActivity(intent)
+                if(isLocationEnabled()) {
+                    val mapIntent = Intent()
+                    mapIntent.setPackage("com.google.android.apps.maps")
+                    startActivity(mapIntent)
+
+                }
+            }
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -117,7 +143,7 @@ class MainActivity : AppCompatActivity() {
             longitude = chosenLocation.longitude
         }
         Database.addReminder(chosenLocation.latitude, chosenLocation.longitude, task)
-//        stopService(Intent(this, ReminderService::class.java))
+////        stopService(Intent(this, ReminderService::class.java))
 //        startForegroundService(Intent(this, ReminderService::class.java))
         val newReminder = Reminder(chosenLocation, task)
 

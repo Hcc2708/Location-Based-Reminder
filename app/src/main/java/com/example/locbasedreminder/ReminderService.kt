@@ -28,7 +28,8 @@ import com.google.android.gms.location.LocationServices
 class ReminderService : Service() {
 
     private val NOTIFICATION_CHANNEL_ID = "ReminderNotificationChannel"
-    private val NOTIFICATION_ID = 1
+    private var NOTIFICATION_ID = 1
+    private var task:String = "Task Reminder"
     private lateinit var  fusedLocationClient:FusedLocationProviderClient
     val Database = ReminderDatabaseHelper(this)
     lateinit var  reminders:MutableList<Reminder>
@@ -51,7 +52,7 @@ class ReminderService : Service() {
         // Logic for monitoring location and triggering reminders
 
         // Start the service as a foreground service
-        startForeground(NOTIFICATION_ID, createNotification())
+        startForeground(NOTIFICATION_ID, createNotification(task))
         startLocationUpdates()
 //        stopSelf()
         return START_STICKY
@@ -107,30 +108,38 @@ class ReminderService : Service() {
             }
         }
     }
+    private var notificationIdCounter = 0
     private fun showReminderNotification(task: String) {
-        val notificationIntent = Intent(this, MainActivity::class.java)
-        val pendingIntent =
-            PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
-
-        val notificationSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-
-        val notificationBuilder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-            .setContentTitle("Reminder Notification")
-            .setContentText(task)
-            .setSmallIcon(R.drawable.baseline_edit_notifications_24)
-            .setContentIntent(pendingIntent)
-            .setSound(notificationSoundUri)  // Set notification sound
-
-        val notification = notificationBuilder.build()
-        val notificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        // Use a unique notification ID to ensure each notification is shown
-        val notificationId = System.currentTimeMillis().toInt()
-        notificationManager.notify(notificationId, notification)
+//        val notificationIntent = Intent(this, MainActivity::class.java)
+//        val pendingIntent =
+//            PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
+//
+//        val notificationSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+//
+//        val notificationBuilder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+//            .setContentTitle("Reminder Notification")
+//            .setContentText(task)
+//            .setSmallIcon(R.drawable.baseline_edit_notifications_24)
+//            .setContentIntent(pendingIntent)
+//            .setSound(notificationSoundUri)  // Set notification sound
+//
+//        val notification = notificationBuilder.build()
+//        val notificationManager =
+//            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+//
+//        // Use a unique notification ID to ensure each notification is shown
+//        val notificationId = notificationIdCounter++
+//        notificationManager.notify(notificationId, notification)
 //        Toast.makeText(this, task, Toast.LENGTH_SHORT).show()
+           updateNotification(task)
     }
-    private fun createNotification(): Notification {
+    private fun updateNotification(task: String) {
+
+            if(task != null)
+            startForeground(NOTIFICATION_ID, createNotification(task))
+
+    }
+    private fun createNotification(task: String): Notification {
         val notificationIntent = Intent(this, MainActivity::class.java)
         val stopServiceIntent = Intent(this, StopServiceReceiver::class.java) // Create a new Intent for stopping the service
         val stopServicePendingIntent = PendingIntent.getBroadcast(this, 0, stopServiceIntent,
@@ -141,7 +150,7 @@ class ReminderService : Service() {
 
         return NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
             .setContentTitle("Location Reminder Service")
-            .setContentText("Running in the background")
+            .setContentText(task)
             .setSmallIcon(R.drawable.baseline_edit_notifications_24)
             .setContentIntent(pendingIntent)
             .addAction(R.drawable.baseline_stop_circle_24, "Stop Service", stopServicePendingIntent) // Add stop action to the notification
