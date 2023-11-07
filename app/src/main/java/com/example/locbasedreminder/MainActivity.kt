@@ -142,7 +142,74 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+        if (ContextCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_PERMISSION_REQUEST_CODE
+            )
+        } else {
+            startLocationUpdates()
+        }
+
     }
+    private val locationRequest: LocationRequest = LocationRequest.create().apply {
+        interval = 10000
+        fastestInterval = 5000
+        priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+    }
+
+    private val locationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult) {
+            super.onLocationResult(locationResult)
+            // Handle location updates
+            locationResult.lastLocation?.let { isUserNearReminderLocation(it) }
+        }
+    }
+
+    private fun startLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+
+            return
+        }
+        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+    }
+
+    private fun stopLocationUpdates() {
+        fusedLocationClient.removeLocationUpdates(locationCallback)
+    }
+
+    private fun isUserNearReminderLocation(location: Location): Boolean {
+        var reminderShown = false
+
+        for ((reminderLocation, task) in reminders) {
+            val proximityRadius = 10.0
+            val reminderLatLng = Location("").apply {
+                latitude = reminderLocation.latitude
+                longitude = reminderLocation.longitude
+            }
+            if (location.distanceTo(reminderLatLng) <= proximityRadius) {
+                showReminderNotification(task)
+                reminderShown = true
+            }
+        }
+
+        return reminderShown
+    }
+
+
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun onMapLocationPicked(chosenLocation: LatLng, task:String) {
@@ -169,6 +236,9 @@ class MainActivity : AppCompatActivity() {
                 onMapLocationPicked(chosenLocation, task)
             }
         }
+    }
+    private fun showReminderNotification(task: String) {
+        Toast.makeText(this, task, Toast.LENGTH_LONG).show()
     }
     private fun isLocationEnabled(): Boolean {
         val locationManager: LocationManager =
