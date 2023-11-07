@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/bg"
     tools:context=".MainActivity">
 
     <androidx.appcompat.widget.Toolbar
@@ -32,9 +34,8 @@
         android:divider="@android:color/darker_gray"
         android:dividerHeight="1dp"
         android:textAlignment="center"
+        android:layout_below="@id/toolbar"
         />
-
-
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -42,6 +43,9 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:layout_margin="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
         android:orientation="vertical"
         android:padding="10dp">
 
@@ -64,13 +68,12 @@
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:layout_marginBottom="16dp"
-            android:tint="@color/white"
+            android:backgroundTint="@color/quantum_purple200"
             android:contentDescription="@string/app_name"
             android:padding="4dp"
-            android:visibility="gone"
             android:src="@drawable/baseline_location_searching_24"
-            android:backgroundTint="@color/quantum_purple200"
-            />
+            android:tint="@color/white"
+            android:visibility="gone" />
 
         <!--on below line we are creating a home fab
         and setting its visibility to gone-->
@@ -81,12 +84,12 @@
             android:layout_margin="8dp"
             android:layout_marginBottom="16dp"
             android:background="@color/quantum_purple200"
+            android:backgroundTint="@color/quantum_purple200"
             android:contentDescription="@string/app_name"
             android:padding="4dp"
             android:src="@drawable/baseline_pin_drop_24"
-            android:visibility="gone"
-            android:backgroundTint="@color/quantum_purple200"
-            android:tint="@color/white" />
+            android:tint="@color/white"
+            android:visibility="gone" />
 
         <!--on below line we are creating a settings fab
         and setting its visibility to gone-->
@@ -94,13 +97,14 @@
             android:id="@+id/options"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:layout_margin="9dp"
             android:layout_marginBottom="16dp"
-            android:background="@color/quantum_purple"
+            android:background="#D69C27B0"
+            android:backgroundTint="#D79C27B0"
             android:contentDescription="@string/app_name"
             android:padding="4dp"
-            android:src="@drawable/baseline_add_task_24"
-            android:backgroundTint="@color/quantum_purple"
+            app:backgroundTint="@color/white"
+            android:src="@drawable/baseline_playlist_add_circle_24"
             android:tint="@color/white" />
 
     </LinearLayout>

@@ -46,6 +46,7 @@ class MapActivity2 : FragmentActivity(), OnMapReadyCallback {
     lateinit var saveButton:Button
     lateinit var popupWindow:PopupWindow
      var receivedValue:LatLng? = null
+    lateinit var recivedTask:String
      var  xOffset:Int = 0
      var  yOffset:Int = 0
     override fun onCreate(savedInstanceState: Bundle?) {

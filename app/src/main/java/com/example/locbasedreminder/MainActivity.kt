@@ -13,6 +13,7 @@ import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
 import android.util.Log
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.Toast
@@ -58,6 +59,7 @@ class MainActivity : AppCompatActivity() {
 //        startForegroundService(Intent(this, ReminderService::class.java))
         startForegroundService(Intent(this, ReminderService::class.java))
         remindersListView = findViewById(R.id.remindersListView)
+
         Database = ReminderDatabaseHelper(this)
         reminders = Database.getReminders()
         reminderAdapter = ReminderAdapter(this, reminders) { position ->
@@ -73,14 +75,24 @@ class MainActivity : AppCompatActivity() {
 
         remindersListView.adapter = reminderAdapter
 
+        remindersListView.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
+            val selectedItem = reminders[position].toString() // Get the selected item
+            // Handle the item click, e.g., open a new activity or show details
+            Toast.makeText(this, "You clicked: $selectedItem", Toast.LENGTH_SHORT).show()
+        }
+
+
+
         option.setOnClickListener{
             if(enable){
+                option.setImageResource(R.drawable.baseline_add_task_24)
                 pickonmap.show()
                 searchOnMap.show()
                 openMap.show()
                 enable = false
             }
             else {
+                option.setImageResource(R.drawable.baseline_playlist_add_circle_24)
                 pickonmap.hide()
                 searchOnMap.hide()
                 openMap.hide()
