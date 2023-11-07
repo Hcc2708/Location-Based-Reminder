@@ -5,17 +5,21 @@
     android:id="@+id/cardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="10dp"
+    app:cardCornerRadius="30dp"
+    android:outlineAmbientShadowColor="@color/black"
     app:cardElevation="4dp"
+    android:backgroundTint="#B0A8ADCA"
     app:cardUseCompatPadding="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+
         android:padding="16dp">
 
         <EditText
+            android:gravity="center"
             android:id="@+id/taskEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -25,10 +29,13 @@
             android:textColor="@android:color/black"/>
 
         <Button
+
+            android:layout_gravity="center"
             android:id="@+id/saveButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Save"
+
             android:background="@color/colorPrimary"
             android:textColor="@android:color/white"
             android:layout_marginTop="8dp"/>
